@@ -2,7 +2,6 @@
 #SBATCH --job-name=cond-cxr-sde
 #SBATCH --partition=bigbatch
 #SBATCH --time=72:00:00
-#SBATCH --gres=gpu:4
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --error=logs/%x-%j.err
 
