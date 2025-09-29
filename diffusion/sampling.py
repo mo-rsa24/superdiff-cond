@@ -36,7 +36,7 @@ def pc_sampler(
     score_model: nn.Module,
     params: dict,
     marginal_prob_std: Callable,
-    diffusion_coeff: Callable, # <-- MODIFIED: Replaced sde_fn_type with Callable
+    diffusion_coeff: Callable,
     batch_size: int,
     img_size: int,
     num_steps: int = 500,
@@ -56,6 +56,10 @@ def pc_sampler(
     """
     devices = jax.local_device_count()
     is_conditional = y_cond is not None
+    # ✨ FIX: Reshape y_cond to be compatible with pmap's mapped axis ✨
+    if is_conditional:
+        y_cond = y_cond.reshape(devices, -1)
+
     pmap_score_fn = make_pmap_score_fn(score_model, conditional=is_conditional)
     time_shape = (devices, batch_size // devices)
     sample_shape = time_shape + (img_size, img_size, 1)
@@ -94,7 +98,7 @@ def Euler_Maruyama_sampler(
     score_model: nn.Module,
     params: dict,
     marginal_prob_std: Callable,
-    diffusion_coeff: Callable, # <-- MODIFIED: Replaced sde_fn_type with Callable
+    diffusion_coeff: Callable,
     batch_size: int,
     img_size: int,
     num_steps: int = 500,
@@ -104,6 +108,10 @@ def Euler_Maruyama_sampler(
     """Euler-Maruyama sampler for conditional generation."""
     devices = jax.local_device_count()
     is_conditional = y_cond is not None
+    # ✨ FIX: Reshape y_cond to be compatible with pmap's mapped axis ✨
+    if is_conditional:
+        y_cond = y_cond.reshape(devices, -1)
+
     pmap_score_fn = make_pmap_score_fn(score_model, conditional=is_conditional)
     time_shape = (devices, batch_size // devices)
     sample_shape = time_shape + (img_size, img_size, 1)
@@ -130,7 +138,7 @@ def ode_sampler(
     score_model: nn.Module,
     params: dict,
     marginal_prob_std: Callable,
-    diffusion_coeff: Callable, # <-- MODIFIED: Replaced sde_fn_type with Callable
+    diffusion_coeff: Callable,
     batch_size: int,
     img_size: int,
     eps: float = 1e-3,
@@ -141,6 +149,10 @@ def ode_sampler(
     """ODE sampler for conditional generation using SciPy's ODE solver."""
     devices = jax.local_device_count()
     is_conditional = y_cond is not None
+    # ✨ FIX: Reshape y_cond to be compatible with pmap's mapped axis ✨
+    if is_conditional:
+        y_cond = y_cond.reshape(devices, -1)
+
     pmap_score_fn = make_pmap_score_fn(score_model, conditional=is_conditional)
     time_shape = (devices, batch_size // devices)
     sample_shape = time_shape + (img_size, img_size, 1)
@@ -172,4 +184,3 @@ def ode_sampler(
     # Reshape final result back to image dimensions.
     x = jnp.asarray(res.y[:, -1]).reshape(sample_shape)
     return x
-
