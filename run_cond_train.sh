@@ -3,7 +3,7 @@
 # Launcher for a full conditional model training run.
 # Edit these variables to configure your run.
 
-export PYFILE="cxr.py"
+export PYFILE="cxr_cond.py"
 export RUN_NAME="conditional-cxr-full-v1"
 export DATA_ROOT="/datasets/mmolefe/cleaned_2/TB"
 

@@ -20,7 +20,7 @@ ok "Activated micromamba environment."
 
 # --- Path and Script Configuration (from launcher) ---
 WORKDIR="${WORKDIR:-$PWD}"
-PYFILE="${PYFILE:-cxr.py}"
+PYFILE="${PYFILE:-cxr_cond.py}"
 cd "$WORKDIR"
 export PYTHONPATH="$WORKDIR"
 
