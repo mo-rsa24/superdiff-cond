@@ -11,13 +11,13 @@ export IMG_SIZE="64"
 # Smaller model
 export CHANNELS="32,64,128,128"
 # Train for more epochs on the tiny dataset to ensure it can memorize
-export EPOCHS="50"
+export EPOCHS="300"
 # Can use a larger batch size due to small images/model
 export BATCH_PER_DEVICE="16"
 export LR="1e-4"
 
 # --- Sample very frequently to see progress ---
-export SAMPLE_EVERY="5"
+export SAMPLE_EVERY="30"
 export CKPT_EVERY="50"
 
 # --- Key change: overfit on 32 examples ---
