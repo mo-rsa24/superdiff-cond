@@ -13,7 +13,7 @@ import torch
 import tqdm
 from flax.serialization import to_bytes
 from flax.training.train_state import TrainState
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset, random_split
 from torchvision.utils import save_image
 
 # --- Local Project Modules ---
@@ -46,8 +46,9 @@ def parse_args():
     p.add_argument("--split", choices=["train", "val", "test"], default="train")
     p.add_argument("--img_size", type=int, default=128)
     p.add_argument("--num_classes", type=int, default=3, help="Number of classes for conditioning.")
+    p.add_argument("--dataset_fraction", type=float, default=1.0,
+                   help="Fraction of the dataset to use (e.g., 0.25 for 25%).")
 
-    # ✨ ADDED: Overfit/Debug Arguments ✨
     p.add_argument("--overfit_one", action="store_true", help="Overfit on a single image.")
     p.add_argument("--overfit_k", type=int, default=0, help="Overfit on K images. 0 to disable.")
     p.add_argument("--repeat_len", type=int, default=8192, help="Dataset length for overfit_one mode.")
@@ -113,17 +114,24 @@ def main():
         raise ValueError(
             f"Mismatch: --num_classes={args.num_classes} but dataset has {len(full_ds.class_map)} classes.")
 
-    # ✨ ADDED: Overfitting Logic ✨
     if args.overfit_one:
         first_img, first_label = full_ds[0]
+
         class RepeatOne(torch.utils.data.Dataset):
             def __len__(self): return args.repeat_len
+
             def __getitem__(self, i): return first_img, first_label
+
         train_ds = RepeatOne()
         print(f"✅ Overfitting on 1 image (label: {first_label}) for {args.repeat_len} steps.")
     elif args.overfit_k > 0:
-        train_ds = torch.utils.data.Subset(full_ds, range(args.overfit_k))
+        train_ds = Subset(full_ds, range(args.overfit_k))
         print(f"✅ Overfitting on first {args.overfit_k} images.")
+    elif args.dataset_fraction < 1.0:
+        num_samples = int(len(full_ds) * args.dataset_fraction)
+        train_ds, _ = random_split(full_ds, [num_samples, len(full_ds) - num_samples],
+                                   generator=torch.Generator().manual_seed(args.seed))
+        print(f"✅ Using {num_samples} images ({args.dataset_fraction:.0%}) of the dataset.")
     else:
         train_ds = full_ds
 
