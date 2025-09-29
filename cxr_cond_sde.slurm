@@ -8,7 +8,7 @@
 set -euo pipefail
 
 # --- Pretty printing helpers ---
-RED=$'\e[31m'; GRN=$'\e[32m'; YLW=$'\e[33m'; BLU=$'\e[34m'; RST=$'\e[0m'; BLD=$'\e[1m'
+RED=$'\e[31m'; GRN=$'\e[32m'; YLW=$'\e[33m'; BLU=$'\e[34m'; CYN=$'\e[36m'; RST=$'\e[0m'; BLD=$'\e[1m'
 banner(){ printf "\n${BLU}${BLD}== %s ==${RST}\n" "$*"; }
 kv(){ printf "  ${CYN}%-20s${RST} %s\n" "$1" "$2"; }
 ok(){ printf "${GRN}%s${RST}\n" "$*"; }
