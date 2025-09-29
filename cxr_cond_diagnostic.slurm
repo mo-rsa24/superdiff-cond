@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=diag-cxr-sde      # Changed job name for clarity
-#SBATCH --partition=bigbatch          # Consider using a smaller/debug partition if available
-#SBATCH --time=00:30:00               # Reduced time limit to 30 minutes
+#SBATCH --job-name=diag-cxr-sde
+#SBATCH --partition=bigbatch
+#SBATCH --time=00:30:00
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --error=logs/%x-%j.err
 
@@ -72,8 +72,17 @@ kv "SLURM Job ID" "${SLURM_JOB_ID}"
 kv "Python Script" "$PYFILE"
 kv "Dataset Root" "$DATA_ROOT"
 kv "Run Name" "${RUN_NAME}-${SLURM_JOB_ID}"
-# ... (other printouts)
+kv "Epochs" "$EPOCHS"
+kv "Image Size" "$IMG_SIZE"
+kv "Num Classes" "$NUM_CLASSES"
+kv "Batch/Device" "$BATCH_PER_DEVICE"
+kv "Sample Every" "$SAMPLE_EVERY epochs"
+kv "Checkpoint Every" "$CKPT_EVERY epochs"
+echo "----------------------------------------"
+echo "Full command:"
+echo "srun python -u $PYFILE ${ARGS[@]}"
 echo "========================================="
 
 srun python -u "$PYFILE" "${ARGS[@]}"
+
 ok "Job finished successfully."
