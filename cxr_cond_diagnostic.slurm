@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=cond-cxr-sde
-#SBATCH --partition=bigbatch
-#SBATCH --time=72:00:00
+#SBATCH --job-name=diag-cxr-sde      # Changed job name for clarity
+#SBATCH --partition=bigbatch          # Consider using a smaller/debug partition if available
+#SBATCH --time=00:30:00               # Reduced time limit to 30 minutes
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --error=logs/%x-%j.err
 
@@ -20,23 +20,23 @@ ok "Activated micromamba environment."
 
 # --- Path and Script Configuration (from launcher) ---
 WORKDIR="${WORKDIR:-$PWD}"
-PYFILE="${PYFILE:-run/cxr_cond.py}"
+PYFILE="${PYFILE:?Must set PYFILE}"
 cd "$WORKDIR"
 export PYTHONPATH="$WORKDIR"
 
-# --- Training Defaults (can be overridden by launcher) ---
+# --- Training Defaults (will be overridden by launcher) ---
 DATA_ROOT="${DATA_ROOT:?Must set DATA_ROOT}"
-RUN_NAME="${RUN_NAME:-conditional-run}"
-IMG_SIZE="${IMG_SIZE:-128}"
+RUN_NAME="${RUN_NAME:-diagnostic-run}"
+IMG_SIZE="${IMG_SIZE:-32}"
 NUM_CLASSES="${NUM_CLASSES:-3}"
 CHANNELS="${CHANNELS:-64,128,256}"
-EPOCHS="${EPOCHS:-200}"
-BATCH_PER_DEVICE="${BATCH_PER_DEVICE:-8}"
+EPOCHS="${EPOCHS:-10}"
+BATCH_PER_DEVICE="${BATCH_PER_DEVICE:-4}"
 LR="${LR:-2e-4}"
-SAMPLE_EVERY="${SAMPLE_EVERY:-10}"
-CKPT_EVERY="${CKPT_EVERY:-20}"
+SAMPLE_EVERY="${SAMPLE_EVERY:-2}"
+CKPT_EVERY="${CKPT_EVERY:-5}"
 WANDB_PROJECT="${WANDB_PROJECT:-conditional-cxr-sde}"
-WANDB_TAGS="${WANDB_TAGS:-slurm,conditional}"
+WANDB_TAGS="${WANDB_TAGS:-slurm,diagnostic}"
 
 # Overfitting controls
 OVERFIT_ONE="${OVERFIT_ONE:-0}"
@@ -67,24 +67,13 @@ elif (( OVERFIT_K > 0 )); then
   kv "OVERFITTING" "$OVERFIT_K images"
 fi
 
-
-banner "Starting Conditional SDE Training"
+banner "Starting DIAGNOSTIC Conditional SDE Training"
 kv "SLURM Job ID" "${SLURM_JOB_ID}"
 kv "Python Script" "$PYFILE"
 kv "Dataset Root" "$DATA_ROOT"
 kv "Run Name" "${RUN_NAME}-${SLURM_JOB_ID}"
-kv "Epochs" "$EPOCHS"
-kv "Image Size" "$IMG_SIZE"
-kv "Num Classes" "$NUM_CLASSES"
-kv "Batch/Device" "$BATCH_PER_DEVICE"
-kv "Sample Every" "$SAMPLE_EVERY epochs"
-kv "Checkpoint Every" "$CKPT_EVERY epochs"
-echo "----------------------------------------"
-echo "Full command:"
-echo "srun python -u $PYFILE ${ARGS[@]}"
+# ... (other printouts)
 echo "========================================="
 
-
 srun python -u "$PYFILE" "${ARGS[@]}"
-
 ok "Job finished successfully."
