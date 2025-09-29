@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export PYFILE="cxr_cond.py" # Assumes the python script is in the same directory
+export PYFILE="run/cxr_cond.py" # Assumes the python script is in the same directory
 export RUN_NAME="conditional-cxr-diagnostic"
 export DATA_ROOT="/datasets/mmolefe/cleaned_2/TB" # Make sure this path is correct
 

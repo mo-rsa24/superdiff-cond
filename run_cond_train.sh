@@ -3,7 +3,7 @@
 # Launcher for a FULL conditional model training run.
 # This is configured for performance to generate plausible images.
 
-export PYFILE="cxr_cond.py" # Assumes the python script is in the same directory
+export PYFILE="run/cxr_cond.py" # Assumes the python script is in the same directory
 export RUN_NAME="conditional-cxr-full-128px-v1"
 export DATA_ROOT="/datasets/mmolefe/cleaned_2/TB" # Make sure this path is correct
 
