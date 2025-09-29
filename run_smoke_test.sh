@@ -1,30 +1,34 @@
 #!/usr/bin/env bash
-# Launcher for a SMOKE TEST. Overfits on a tiny dataset.
-# GOAL: Finish in < 30 minutes to verify the pipeline.
+# Launcher for a FIDELITY TEST. Overfits on a tiny dataset.
+# GOAL: Start to see anatomical structure to verify model capacity.
 
 export PYFILE="run/cxr_cond.py"
-export RUN_NAME="smoke-test-64px"
+export RUN_NAME="fidelity-test-128px" # Updated name
 export DATA_ROOT="/datasets/mmolefe/cleaned_2/TB"
 
-# --- Drastically reduce everything for speed ---
-export IMG_SIZE="64"
-# Smaller model
-export CHANNELS="32,64,128,128"
-# Train for more epochs on the tiny dataset to ensure it can memorize
-export EPOCHS="300"
-# Can use a larger batch size due to small images/model
-export BATCH_PER_DEVICE="16"
+# --- Parameters increased for higher fidelity ---
+# 💡 1. Increase image size for more detail.
+export IMG_SIZE="128"
+
+# 🧠 2. Increase model capacity to learn complex structures.
+export CHANNELS="64,128,128,256"
+
+# ⏳ 3. Increase epochs significantly. Diffusion needs time.
+export EPOCHS="1500"
+
+# ‼️ 4. Decrease batch size to prevent out-of-memory errors.
+export BATCH_PER_DEVICE="4"
 export LR="1e-4"
 
-# --- Sample very frequently to see progress ---
-export SAMPLE_EVERY="30"
-export CKPT_EVERY="50"
+# --- Keep frequent sampling to monitor progress ---
+export SAMPLE_EVERY="50"
+export CKPT_EVERY="100"
 
-# --- Key change: overfit on 32 examples ---
+# --- Continue overfitting on 32 examples ---
 export OVERFIT_ONE="0"
 export OVERFIT_K="32"
 
 export WANDB_PROJECT="conditional-cxr-sde"
-export WANDB_TAGS="slurm,smoke-test"
+export WANDB_TAGS="slurm,fidelity-test"
 
 sbatch cxr_smoke_test.slurm
